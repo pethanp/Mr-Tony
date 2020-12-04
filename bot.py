@@ -5,9 +5,9 @@ from discord.ext import commands
 
 
 
-class MyClient(discord.Client):
+class MyClient(discord.ext.commands.Bot):
     async def on_ready(self):
-        print('Logged on as {0}!'.format(self.user))
+        print(f'Logged on as {self.user}!')
 
         print(self.guilds)
 
@@ -29,8 +29,6 @@ def get_key():
     except:
         raise FileNotFoundError("!Key file not found!.\n")
 
-client = MyClient()
+client = MyClient(command_prefix='/')
 
-key = get_key()
-print(f"Key is: {key}")
-client.run(key)
+client.run(get_key())
