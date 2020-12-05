@@ -45,7 +45,7 @@ def log_voice_state_update(member, before, after):
         join = True
     else:
         join = False
-    if before.channel != after.channel:
+    if before.channel is not None and before.channel != after.channel:
         leave = True
     else:
         leave = False
@@ -84,7 +84,7 @@ async def userTime(ctx, name):
     guild = ctx.guild
     targetMember = None
     for member in guild.members:
-        if member.name == name:
+        if member.name == name or member.nick:
             targetMember = member
             break
     if targetMember is None:
