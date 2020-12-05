@@ -27,10 +27,15 @@ async def on_ready():
 @client.command()
 async def userTime(ctx, name):
     guild = ctx.guild
-    print(guild.members)
+    targetMember = None
     for member in guild.members:
-        print("Member '{}' joined at {}".format(member.name, member.joined_at))
-    print("Member count: {}".format(guild.member_count))
-    
+        if member.name == name:
+            targetMember = member
+            break
+    if targetMember is None:
+        responseMsg = f"Member '{name}' could not be found"
+    else:
+        responseMsg = "Member '{}' joined at {}".format(member.name, member.joined_at)
+    await ctx.message.channel.send(responseMsg)
 
 client.run(get_key())
