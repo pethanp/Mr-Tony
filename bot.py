@@ -4,20 +4,6 @@ import discord
 from discord.ext import commands
 
 
-
-class MyClient(discord.ext.commands.Bot):
-    async def on_ready(self):
-        print(f'Logged on as {self.user}!')
-
-        print(self.guilds)
-
-    async def on_message(self, message):
-        if message.author == client.user:
-            return
-
-        if message.content.startswith('/'):
-            await message.channel.send(f'MESSAGE: {message.content}')
-
 def get_key():
 
     try:
@@ -29,10 +15,22 @@ def get_key():
     except:
         raise FileNotFoundError("!Key file not found!.\n")
 
-client = commands.Bot(command_prefix='/')
+intents = discord.Intents.all()
+client = commands.Bot(command_prefix='/', intents=intents)
+
+@client.event
+async def on_ready():
+    print("Ready")
+    print(f'Logged on as {client.user}!')
+
 
 @client.command()
 async def nameHistory(ctx, name):
-    await ctx.send(f"Name: {name}")
+    guild = ctx.guild
+    print(guild.members)
+    for member in guild.members:
+        print("Member '{}' joined at {}".format(member.name, member.joined_at))
+    print("Member count: {}".format(guild.member_count))
+    
 
 client.run(get_key())
