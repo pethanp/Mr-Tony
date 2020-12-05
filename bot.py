@@ -23,6 +23,10 @@ async def on_ready():
     print("Ready")
     print(f'Logged on as {client.user}!')
 
+@client.event
+async def on_member_update(before, after):
+    # check name changes here
+    pass
 
 @client.command()
 async def userTime(ctx, name):
