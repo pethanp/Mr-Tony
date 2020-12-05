@@ -56,11 +56,11 @@ def log_voice_state_update(member, before, after):
         channel_id = None
         channel_name = None
     d = {"time": datetime.datetime.now(),
-         "user_id":userId,
+         "user_id": str(userId),
          "user_name": userName,
          "join": join,
          "leave" : leave,
-         "channel_id": channel_id,
+         "channel_id": str(channel_id),
          "channel_name": channel_name
         }
     print(f"Adding {d} to voice logs")
