@@ -5,6 +5,8 @@ import pandas as pd
 import discord
 from discord.ext import commands
 
+# this can be changed for prod
+logFolder = "testLogs"
 
 def get_key():
 
@@ -32,7 +34,7 @@ async def on_member_update(before, after):
 
 
 def log_voice_state_update(member, before, after):
-    logFile = "testLogs/voiceUpdates.csv"
+    logFile = os.path.join(logFolder, "voiceUpdates.csv")
     if not os.path.isfile(logFile):
         df = pd.DataFrame(columns = ["time", "user_id", "user_name", "join", "leave", "channel_id", "channel_name"])
     else:
@@ -43,7 +45,7 @@ def log_voice_state_update(member, before, after):
         join = True
     else:
         join = False
-    if before.channel is not None and after.channel is None:
+    if before.channel != after.channel:
         leave = True
     else:
         leave = False
@@ -71,6 +73,12 @@ async def on_voice_state_update(member, before, after):
     log_voice_state_update(member, before, after)
 
 
+def make_user_time_response(member: discord.Member):
+    voicePath = os.path.join(logFolder, "voiceUpdates.csv")
+    df = pd.read_csv(voicePath)
+    df = df[df["user_id"] == member.id]
+    print(df)
+
 @client.command()
 async def userTime(ctx, name):
     guild = ctx.guild
@@ -82,6 +90,7 @@ async def userTime(ctx, name):
     if targetMember is None:
         responseMsg = f"Member '{name}' could not be found"
     else:
+        make_user_time_response(member)
         responseMsg = "Member '{}' joined at {}".format(member.name, member.joined_at)
     await ctx.message.channel.send(responseMsg)
 
