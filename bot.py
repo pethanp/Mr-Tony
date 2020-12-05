@@ -76,27 +76,29 @@ async def on_voice_state_update(member, before, after):
 def make_user_time_response(member: discord.Member):
     voicePath = os.path.join(logFolder, "voiceUpdates.csv")
     df = pd.read_csv(voicePath)
-    df = df[df["user_id"] == member.id]
-    if len(df) == 0:
+    user_df = df[df["user_id"] == member.id]
+    if len(user_df) == 0:
         print("No entries found for the given user")
     serverToTime = dict()
     # if the user is in the server before the bot loaded
     # that time will be ignored because of this
-    channel = list(df["channel_id"])[0]
-    startTime = pd.to_datetime(list(df["time"])[0])
-    for index in df.index:
-        if df["leave"][index]:
+    channel = list(user_df["channel_id"])[0]
+    startTime = pd.to_datetime(list(user_df["time"])[0])
+    for index in user_df.index:
+        if user_df["leave"][index]:
             if channel not in serverToTime:
                 serverToTime[channel] = datetime.timedelta()
-            endTime = pd.to_datetime(df["time"][index])
+            endTime = pd.to_datetime(user_df["time"][index])
             serverToTime[channel] = endTime - startTime
             # set channel to none to track leaving all servers
             channel = None
-        if df["join"][index]:
-            channel = df["channel_id"][index]
-            startTime = pd.to_datetime(df["time"][index])
+        if user_df["join"][index]:
+            channel = user_df["channel_id"][index]
+            startTime = pd.to_datetime(user_df["time"][index])
     if channel is not None:
         serverToTime[channel] += datetime.datetime.now() - startTime
+
+    
     channelTimeStrings = []
     for channel, time in serverToTime.items():
         channelTimeStrings.append("Channel {}: {}".format(channel, time))
