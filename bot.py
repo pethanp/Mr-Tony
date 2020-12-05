@@ -29,6 +29,10 @@ def get_key():
     except:
         raise FileNotFoundError("!Key file not found!.\n")
 
-client = MyClient(command_prefix='/')
+client = commands.Bot(command_prefix='/')
+
+@client.command()
+async def nameHistory(ctx, name):
+    await ctx.send(f"Name: {name}")
 
 client.run(get_key())
