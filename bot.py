@@ -39,7 +39,7 @@ def log_voice_state_update(member, before, after):
         df = pd.read_csv(logFile)
     userId = member.id
     userName = member.name
-    if before.channel != after.channel:
+    if before.channel != after.channel and after.channel is not None:
         join = True
     else:
         join = False
@@ -48,8 +48,7 @@ def log_voice_state_update(member, before, after):
     else:
         leave = False
     if after.channel:
-        # channel_id = after.channel.channel_id
-        channel_id = None
+        channel_id = after.channel.id
         channel_name = after.channel.name
     else:
         channel_id = None
