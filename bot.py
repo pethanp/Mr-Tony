@@ -25,7 +25,7 @@ async def on_ready():
 
 
 @client.command()
-async def nameHistory(ctx, name):
+async def userTime(ctx, name):
     guild = ctx.guild
     print(guild.members)
     for member in guild.members:
