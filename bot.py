@@ -82,14 +82,14 @@ async def make_user_time_response(member: discord.Member):
     serverToTime = dict()
     # if the user is in the server before the bot loaded
     # that time will be ignored because of this
-    channel = list(user_df["channel_id"])[0]
+    channel = user_df["channel_id"].iloc[0]
     startTime = pd.to_datetime(list(user_df["time"])[0])
     for index in user_df.index:
         if user_df["leave"][index]:
             if channel not in serverToTime:
                 serverToTime[channel] = datetime.timedelta()
             endTime = pd.to_datetime(user_df["time"][index])
-            serverToTime[channel] = endTime - startTime
+            serverToTime[channel] += endTime - startTime
             # set channel to none to track leaving all servers
             channel = None
         if user_df["join"][index]:
