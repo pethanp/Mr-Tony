@@ -73,7 +73,7 @@ async def on_voice_state_update(member, before, after):
     log_voice_state_update(member, before, after)
 
 
-def make_user_time_response(member: discord.Member):
+async def make_user_time_response(member: discord.Member):
     voicePath = os.path.join(logFolder, "voiceUpdates.csv")
     df = pd.read_csv(voicePath)
     user_df = df[df["user_id"] == member.id]
@@ -98,17 +98,9 @@ def make_user_time_response(member: discord.Member):
     if channel is not None:
         serverToTime[channel] += datetime.datetime.now() - startTime
 
-    # filter df to include most recent server entry
-    # uses lasts, assumes that entries are appended so newest entry is last
-    df = df.drop_duplicates(subset = "channel_id", keep='last')
-    channelIdToName = dict()
-    for channelId in serverToTime.keys():
-        name = df[df["channel_id"] == channelId]["channel_name"].iloc[0]
-        channelIdToName[channelId] = name
-    
     channelTimeStrings = []
     for channelId, time in serverToTime.items():
-        channelName = channelIdToName[channelId]
+        channelName = (await client.fetch_channel(channelId)).name
         days = time.days
         seconds = time.seconds
         hours = seconds // 3600
@@ -133,7 +125,7 @@ async def userTime(ctx, name):
     if targetMember is None:
         responseMsg = f"Member '{name}' could not be found"
     else:
-        responseMsg = make_user_time_response(member)
+        responseMsg = await make_user_time_response(member)
     await ctx.message.channel.send(responseMsg)
 
 client.run(get_key())
