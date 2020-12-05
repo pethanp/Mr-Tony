@@ -98,10 +98,28 @@ def make_user_time_response(member: discord.Member):
     if channel is not None:
         serverToTime[channel] += datetime.datetime.now() - startTime
 
+    # filter df to include most recent server entry
+    # uses lasts, assumes that entries are appended so newest entry is last
+    df = df.drop_duplicates(subset = "channel_id", keep='last')
+    channelIdToName = dict()
+    for channelId in serverToTime.keys():
+        name = df[df["channel_id"] == channelId]["channel_name"].iloc[0]
+        channelIdToName[channelId] = name
     
     channelTimeStrings = []
-    for channel, time in serverToTime.items():
-        channelTimeStrings.append("Channel {}: {}".format(channel, time))
+    for channelId, time in serverToTime.items():
+        channelName = channelIdToName[channelId]
+        days = time.days
+        seconds = time.seconds
+        hours = seconds // 3600
+        seconds = seconds % 3600
+        minutes = seconds // 60
+        seconds = seconds % 60
+
+        timeStr = f"{hours} hours, {minutes} minutes and {seconds} seconds"
+        if days > 0:
+            timeStr = f"{days} days, " + timeStr
+        channelTimeStrings.append(f"{channelName}: {timeStr}")
     return "\n".join(channelTimeStrings)
 
 @client.command()
