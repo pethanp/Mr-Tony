@@ -28,6 +28,12 @@ async def on_member_update(before, after):
     # check name changes here
     pass
 
+@client.event
+async def on_voice_state_update(member, before, after):
+    print("Member: {}".format(member))
+    print(f"Before {before}")
+    print(f"After {after}")
+
 @client.command()
 async def userTime(ctx, name):
     guild = ctx.guild
