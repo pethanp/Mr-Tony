@@ -34,6 +34,27 @@ async def on_member_update(before, after):
 
 
 def log_voice_state_update(member, before, after):
+    """Log a user joining / leaving a channel.
+
+    It is possible that a voice update comes from muting / deafening. Currently,
+    this isn't handled and will be logged with join and true both False.
+
+    "leave" is True when we leave the channel previously joined.
+    "join" is True when the current channel_id is being joined.
+    It is possible to both "leave" and "join" at the same time when swtiching
+    channels.
+
+    TODO - we probably don't need to log user name and channel name since we
+    should be able to access these from the id.
+    We could also handle other voice updates outside of join or leave (such
+    as mute) or not log anything when one of these events occurs.
+    Instead of using a csv, we could use a database.
+
+    Args:
+        member: the member the update is for
+        before: the state before the event
+        after: the state after the event
+    """
     logFile = os.path.join(logFolder, "voiceUpdates.csv")
     if not os.path.isfile(logFile):
         df = pd.DataFrame(columns = ["time", "user_id", "user_name", "join", "leave", "channel_id", "channel_name"])
@@ -70,10 +91,25 @@ def log_voice_state_update(member, before, after):
 
 @client.event
 async def on_voice_state_update(member, before, after):
+    """Adds update to logs."""
     log_voice_state_update(member, before, after)
 
 
-async def make_user_time_response(member: discord.Member):
+async def make_user_time_response(member: discord.Member) -> str:
+    """Make the response to show a client for user time.
+
+    TODO - if we updat the log to use a database, this needs to be
+    updated as well.
+    We also don't have very good error handling if the bot goes offline, so
+    our algorithm could check if times online seem unreasonable to avoid this
+    (or something could be improved in the logging).
+    Currently doesn't handle multiple guilds (it will just show everything
+    for that user in our logs, while we should only show the channels in
+    the current guild)
+
+    Args:
+        member (discord.member): the member to get time for
+    """
     voicePath = os.path.join(logFolder, "voiceUpdates.csv")
     df = pd.read_csv(voicePath)
     user_df = df[df["user_id"] == member.id]
