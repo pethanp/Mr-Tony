@@ -150,6 +150,17 @@ async def make_user_time_response(member: discord.Member) -> str:
         channelTimeStrings.append(f"{channelName}: {timeStr}")
     return "\n".join(channelTimeStrings)
 
+async def get_member_from_name(name: str, guild: discord.Guild) -> discord.Member:
+    target = None
+    for member in guild.members:
+        if member.name == name or member.nick:
+            if not target:
+                target = member
+            else:
+                # found 2 of the same name
+                raise Exception(f"Found 2 members with the name {name}")
+    return target
+
 @client.command()
 async def userTime(ctx, name):
     guild = ctx.guild
@@ -166,6 +177,7 @@ async def userTime(ctx, name):
 
 @client.command()
 async def nameHistory(ctx, name):
+    member = await get_member_from_name(name, ctx.guild)
     await ctx.message.channel.send("Name history command")
 
 client.run(get_key())
