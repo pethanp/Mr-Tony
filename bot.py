@@ -164,12 +164,8 @@ async def get_member_from_name(name: str, guild: discord.Guild) -> discord.Membe
 @client.command()
 async def userTime(ctx, name):
     guild = ctx.guild
-    targetMember = None
-    for member in guild.members:
-        if member.name == name or member.nick:
-            targetMember = member
-            break
-    if targetMember is None:
+    member = await get_member_from_name(name, ctx.guild)
+    if member is None:
         responseMsg = f"Member '{name}' could not be found"
     else:
         responseMsg = await make_user_time_response(member)
