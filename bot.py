@@ -27,10 +27,25 @@ async def on_ready():
     print("Ready")
     print(f'Logged on as {client.user}!')
 
+def log_name_change(before_name: str, after_name: str, user_id: str):
+    logFile = os.path.join(logFolder, "nameUpdates.csv")
+    if not os.path.isfile(logFile):
+        df = pd.DataFrame(columns = ["before_name", "after_name", "user_id"])
+    else:
+        df = pd.read_csv(logFile)
+    entry = {"before_name": before_name,
+             "after_name": after_name,
+             "user_id": user_id
+            }
+    print(f"Logging name update: {entry}")
+    df = df.append(entry, ignore_index = True)
+    df.to_csv(logFile, index=False)
+
 @client.event
-async def on_member_update(before, after):
-    # check name changes here
-    pass
+async def on_member_update(before: discord.Member, after: discord.Member):
+    # check for nickname change
+    if before.nick != after.nick:
+        log_name_change(before.nick, after.nick, str(after.id))
 
 
 def log_voice_state_update(member, before, after):
