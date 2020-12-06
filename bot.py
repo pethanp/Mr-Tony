@@ -164,4 +164,8 @@ async def userTime(ctx, name):
         responseMsg = await make_user_time_response(member)
     await ctx.message.channel.send(responseMsg)
 
+@client.command()
+async def nameHistory(ctx, name):
+    await ctx.message.channel.send("Name history command")
+
 client.run(get_key())
