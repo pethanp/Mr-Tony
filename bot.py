@@ -166,7 +166,21 @@ async def make_user_time_response(member: discord.Member) -> str:
     return "\n".join(channelTimeStrings)
 
 async def make_name_history_response(member: discord.Member, guild: discord.Guild) -> str:
-    return "Name history log not implemented"
+    namePath = os.path.join(logFolder, "nameUpdates.csv")
+    df = pd.read_csv(namePath)
+    print(df)
+    df = df[df["user_id"] == member.id]
+    print(df)
+    if len(df) == 0:
+        return f"Did not find any name changes for {member.nick}"
+    firstName = df["before_name"].iloc[0]
+    nameHistory = [firstName]
+    for name in df["after_name"]:
+        nameHistory.append(name)
+    # in increasing order
+    nameHistory.reverse()
+    return f"Name History for {member.nick}\n" + \
+            "\n".join(["(newest)"] + nameHistory + ["(oldest)"])
 
 async def get_member_from_name(name: str, guild: discord.Guild) -> discord.Member:
     target = None
@@ -197,6 +211,6 @@ async def nameHistory(ctx, name):
         responseMsg = f"Member '{name}' could not be found"
     else:
         responseMsg = await make_name_history_response(member, guild)
-    await ctx.message.channel.send("Name history command")
+    await ctx.message.channel.send(responseMsg)
 
 client.run(get_key())
