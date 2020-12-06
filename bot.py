@@ -150,6 +150,9 @@ async def make_user_time_response(member: discord.Member) -> str:
         channelTimeStrings.append(f"{channelName}: {timeStr}")
     return "\n".join(channelTimeStrings)
 
+async def make_name_history_response(member: discord.Member, guild: discord.Guild) -> str:
+    return "Name history log not implemented"
+
 async def get_member_from_name(name: str, guild: discord.Guild) -> discord.Member:
     target = None
     for member in guild.members:
@@ -173,7 +176,12 @@ async def userTime(ctx, name):
 
 @client.command()
 async def nameHistory(ctx, name):
-    member = await get_member_from_name(name, ctx.guild)
+    guild = ctx.guild
+    member = await get_member_from_name(name, guild)
+    if member is None:
+        responseMsg = f"Member '{name}' could not be found"
+    else:
+        responseMsg = await make_name_history_response(member, guild)
     await ctx.message.channel.send("Name history command")
 
 client.run(get_key())
